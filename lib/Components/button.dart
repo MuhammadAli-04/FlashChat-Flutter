@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chat_app/constants.dart';
+import 'package:chat_app/utilities/constants.dart';
 
 class Button extends StatelessWidget {
   const Button({super.key, required this.text, required this.onPressed});

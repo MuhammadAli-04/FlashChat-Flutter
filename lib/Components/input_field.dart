@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chat_app/constants.dart';
+import 'package:chat_app/utilities/constants.dart';
 
 class InputField extends StatefulWidget {
   InputField(
