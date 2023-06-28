@@ -40,3 +40,14 @@ const kHeadingStyle = TextStyle(
     letterSpacing: 2.0,
     color: Colors.blueAccent,
     decoration: TextDecoration.underline);
+
+void showSnackBar(String value, BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(value),
+      action: SnackBarAction(
+          label: 'Dismiss',
+          onPressed: ScaffoldMessenger.of(context).removeCurrentSnackBar),
+    ),
+  );
+}

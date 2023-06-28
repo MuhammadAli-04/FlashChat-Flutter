@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../Components/input_field.dart';
 import '../Components/button.dart';
 import '../utilities/validation.dart';
+import '../utilities/constants.dart';
+import '../Screens/chat_screen.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:image_picker/image_picker.dart';
 
@@ -27,23 +32,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
+  final storage = FirebaseStorage.instance.ref();
 
   String? imgPath;
-
-  String? validateReenteredPassword(String? value) {
-    return value! == rePasswordController.text ? null : "Passwords donot match";
-  }
-
-  void showSnackBar(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(value),
-        action: SnackBarAction(
-            label: 'Dismiss',
-            onPressed: ScaffoldMessenger.of(context).removeCurrentSnackBar),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +47,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 tag: 'logo',
                 child: Image.asset(
                   'images/logo.png',
-                  width: 50.0,
+                  width: 30.0,
                 ),
               ),
               const Text("Registration Form")
@@ -75,15 +66,45 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Column(
                 children: [
                   MaterialButton(
-                    onPressed: () {
+                    onPressed: () async {
                       ImagePicker img = ImagePicker();
-                      //TODO : implement image upload while registering
+                      XFile? file =
+                          await img.pickImage(source: ImageSource.gallery);
+                      if (file != null) {
+                        Reference imgDir =
+                            storage.child("Images").child(file.name);
+                        try {
+                          imgDir
+                              .putFile(File(file.path.toString()))
+                              .snapshotEvents
+                              .listen((snapshot) async {
+                            switch (snapshot.state) {
+                              case TaskState.success:
+                                showSnackBar("Upload Successful", context);
+                                String path = await imgDir.getDownloadURL();
+                                setState(() {
+                                  imgPath = path.toString();
+                                });
+                                break;
+                              case TaskState.error:
+                                showSnackBar(
+                                    "Some error occurred,Please Try again!",
+                                    context);
+                                break;
+                              default:
+                                break;
+                            }
+                          });
+                        } catch (e) {
+                          showSnackBar(e.toString(), context);
+                        }
+                      }
                     },
                     child: CircleAvatar(
                       radius: 64,
                       backgroundImage: const AssetImage('images/add-photo.jpg'),
                       foregroundImage:
-                          imgPath != null ? AssetImage(imgPath!) : null,
+                          imgPath != null ? NetworkImage(imgPath!) : null,
                     ),
                   ),
                   const SizedBox(
@@ -133,7 +154,10 @@ class _SignupScreenState extends State<SignupScreen> {
                   InputField(
                     controller: rePasswordController,
                     keyboard: TextInputType.text,
-                    validator: validateReenteredPassword,
+                    validator: (value) {
+                      return Validation.validateReenteredPassword(
+                          value!, passwordController.text);
+                    },
                     hintText: "Re-enter Password",
                     icon: Icons.password,
                     obscureData: true,
@@ -144,6 +168,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   Button(
                     text: "Register",
                     onPressed: () async {
+                      if (!_formKey.currentState!.validate()) {
+                        return;
+                      }
                       try {
                         await auth.createUserWithEmailAndPassword(
                             email: emailController.text,
@@ -152,7 +179,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         final user = <String, dynamic>{
                           'name': fullNameController.text,
                           'email': emailController.text,
-                          'username': usernameController.text
+                          'username': usernameController.text,
+                          'imgPath': imgPath
                         };
 
                         db.collection('Users').add(user);
@@ -165,7 +193,8 @@ class _SignupScreenState extends State<SignupScreen> {
                           (value) {
                             for (var doc in value.docs) {
                               showSnackBar(
-                                  "user created : ${doc.data()['username']}");
+                                  "user created : ${doc.data()['username']}",
+                                  context);
                             }
                           },
                         );
@@ -176,9 +205,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         passwordController.clear();
                         rePasswordController.clear();
 
-                        Navigator.pop(context);
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            ChatScreen.id, (Route<dynamic> route) => false);
                       } catch (e) {
-                        showSnackBar(e.toString());
+                        showSnackBar(e.toString(), context);
                       }
                     },
                   )

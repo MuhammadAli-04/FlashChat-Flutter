@@ -34,6 +34,8 @@ dependencies:
   firebase_admin: ^0.2.0
   firebase_auth: ^4.6.3
   firebase_core: ^2.14.0
+  firebase_database: ^10.2.3
+  firebase_storage: ^11.2.4
   flutter:
     sdk: flutter
   flutter_pw_validator: ^1.6.0

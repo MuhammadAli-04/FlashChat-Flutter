@@ -1,8 +1,14 @@
+import 'package:chat_app/Screens/chat_screen.dart';
+import 'package:chat_app/utilities/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../Components/button.dart';
 import '../Components/input_field.dart';
 import '../Components/heading.dart';
-import 'package:email_validator/email_validator.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../utilities/validation.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  final auth = FirebaseAuth.instance;
+  final storage = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       keyboard: TextInputType.emailAddress,
                       hintText: "Email",
                       icon: Icons.email,
-                      validator: (value) {
-                        return value!.isEmpty
-                            ? "Enter email"
-                            : EmailValidator.validate(value)
-                                ? null
-                                : "Enter valid email";
-                      },
+                      validator: Validation.validateEmail,
                     ),
                     const SizedBox(
                       height: 10.0,
@@ -62,22 +65,41 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: "Password",
                       icon: Icons.password,
                       obscureData: true,
-                      validator: (value) {
-                        return value!.length < 8
-                            ? "Password must be of at least 8 characters"
-                            : null;
-                      },
+                      validator: Validation.validatePassword,
                     ),
                     const SizedBox(
                       height: 40.0,
                     ),
                     Button(
                       text: "Login",
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          emailController.clear();
-                          passwordController.clear();
+                      onPressed: () async {
+                        if (!formKey.currentState!.validate()) {
+                          return;
                         }
+
+                        try {
+                          await auth.signInWithEmailAndPassword(
+                              email: emailController.text,
+                              password: passwordController.text);
+                          storage
+                              .collection("Users")
+                              .where('email', isEqualTo: emailController.text)
+                              .get()
+                              .then((value) {
+                            for (var doc in value.docs) {
+                              showSnackBar(
+                                  "user logged in : ${doc.data()['username']}",
+                                  context);
+                            }
+                          });
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              ChatScreen.id, (Route<dynamic> route) => false);
+                        } catch (e) {
+                          showSnackBar(e.toString(), context);
+                        }
+
+                        emailController.clear();
+                        passwordController.clear();
                       },
                     ),
                   ],
