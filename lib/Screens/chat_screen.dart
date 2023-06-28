@@ -1,126 +1,88 @@
 import 'package:flutter/material.dart';
-import '../Components/chat_tile.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  ChatScreen({super.key, this.imgUrl, required this.name});
 
-  static const id = "ChatScreen";
+  static String id = "ChatScreen";
+  String? imgUrl;
+  final String name;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  String name = "Ali";
   TextEditingController msgController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        backgroundColor: Colors.blueGrey,
-        child: SafeArea(
-          child: Column(
-            children: [
-              DrawerHeader(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    const Text(
-                      "Drawer Header",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.close),
-                    )
-                  ],
-                ),
-              ),
-              const Text("Hello"),
-              const Text("Hello"),
-              const Text("Hello"),
-              const Text("Hello"),
-            ],
-          ),
-        ),
-      ),
       appBar: AppBar(
-        title: const Text("Chats"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 20.0,
+              backgroundImage: const AssetImage('images/user.jpg'),
+              foregroundImage:
+                  widget.imgUrl == null ? null : NetworkImage(widget.imgUrl!),
+            ),
+            const SizedBox(
+              width: 10.0,
+            ),
+            Text(widget.name),
+          ],
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
             onPressed: () {},
-          )
+            icon: const Icon(Icons.more_vert),
+          ),
         ],
+        elevation: 10.0,
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
+            const SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                    Text("Hello"),
+                  ],
+                )),
+            TextField(
+              controller: msgController,
+              keyboardType: TextInputType.text,
+              autocorrect: false,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                  hintText: "Message...",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                  )),
+            )
           ],
         ),
       ),

@@ -5,7 +5,7 @@ import '../Components/input_field.dart';
 import '../Components/button.dart';
 import '../utilities/validation.dart';
 import '../utilities/constants.dart';
-import '../Screens/chat_screen.dart';
+import 'allchats_screen.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -171,6 +171,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       if (!_formKey.currentState!.validate()) {
                         return;
                       }
+
+                      if (!await Validation.checkUsername(
+                          usernameController.text, context)) {
+                        return;
+                      }
+
                       try {
                         await auth.createUserWithEmailAndPassword(
                             email: emailController.text,
@@ -206,7 +212,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         rePasswordController.clear();
 
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                            ChatScreen.id, (Route<dynamic> route) => false);
+                            AllChatScreen.id, (Route<dynamic> route) => false);
                       } catch (e) {
                         showSnackBar(e.toString(), context);
                       }

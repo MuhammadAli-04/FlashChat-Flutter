@@ -1,3 +1,4 @@
+import 'package:chat_app/Screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 class ChatTile extends StatelessWidget {
@@ -13,8 +14,15 @@ class ChatTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ChatScreen(name: title, imgUrl: imgUrl)));
+        },
         leading: CircleAvatar(
-          backgroundImage: const AssetImage('images/add-photo.jpg'),
+          backgroundImage: const AssetImage('images/user.jpg'),
           foregroundImage: imgUrl != null ? NetworkImage(imgUrl!) : null,
           radius: 30.0,
         ),

@@ -1,4 +1,4 @@
-import 'package:chat_app/Screens/chat_screen.dart';
+import 'package:chat_app/Screens/allchats_screen.dart';
 import 'package:chat_app/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -93,7 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                           });
                           Navigator.of(context).pushNamedAndRemoveUntil(
-                              ChatScreen.id, (Route<dynamic> route) => false);
+                              AllChatScreen.id,
+                              (Route<dynamic> route) => false);
                         } catch (e) {
                           showSnackBar(e.toString(), context);
                         }

@@ -1,3 +1,4 @@
+import 'package:chat_app/Screens/allchats_screen.dart';
 import 'package:chat_app/Screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'Screens/welcome_screen.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         WelcomeScreen.id: (context) => const WelcomeScreen(),
         LoginScreen.id: (context) => const LoginScreen(),
         SignupScreen.id: (context) => const SignupScreen(),
-        ChatScreen.id: (context) => const ChatScreen(),
+        AllChatScreen.id: (context) => const AllChatScreen(),
       },
       initialRoute: WelcomeScreen.id,
       debugShowCheckedModeBanner: false,
