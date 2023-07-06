@@ -1,10 +1,12 @@
+import 'package:chat_app/Components/message_bubble.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  ChatScreen({super.key, this.imgUrl, required this.name});
+  const ChatScreen({super.key, this.imgUrl, required this.name});
 
   static String id = "ChatScreen";
-  String? imgUrl;
+  final String? imgUrl;
   final String name;
 
   @override
@@ -13,6 +15,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController msgController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,44 +48,38 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                    Text("Hello"),
-                  ],
-                )),
+            Expanded(
+                child: StreamBuilder(
+              stream:
+                  FirebaseFirestore.instance.collection('Chats').snapshots(),
+              builder: (context, snapshot) => ListView(
+                children: const [
+                  MessageBubble(sender: "Ali", text: "Hey", isMe: true),
+                  MessageBubble(
+                      sender: "Hassan", text: "what's up?", isMe: false),
+                  MessageBubble(
+                      sender: "Hassan", text: "you good?", isMe: false),
+                  MessageBubble(sender: "Ali", text: "Hey", isMe: true),
+                ],
+              ),
+            )),
             TextField(
               controller: msgController,
               keyboardType: TextInputType.text,
               autocorrect: false,
               minLines: 1,
               maxLines: 3,
-              decoration: const InputDecoration(
-                  hintText: "Message...",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                  )),
-            )
+              decoration: InputDecoration(
+                hintText: "Message...",
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                ),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () {},
+                ),
+              ),
+            ),
           ],
         ),
       ),

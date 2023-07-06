@@ -1,15 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import '../Components/input_field.dart';
-import '../Components/button.dart';
-import '../utilities/validation.dart';
-import '../utilities/constants.dart';
-import 'allchats_screen.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:chat_app/Components/input_field.dart';
+import 'package:chat_app/Components/button.dart';
+import 'package:chat_app/Screens/allchats_screen.dart';
+import 'package:chat_app/utilities/validation.dart';
+import 'package:chat_app/utilities/constants.dart';
+import 'package:chat_app/utilities/firebase_data.dart';
 
 import 'package:image_picker/image_picker.dart';
 
@@ -29,10 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController fullNameController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController rePasswordController = TextEditingController();
-
-  final auth = FirebaseAuth.instance;
-  final db = FirebaseFirestore.instance;
-  final storage = FirebaseStorage.instance.ref();
+  FirebaseData firebaseData = FirebaseData();
 
   String? imgPath;
 
@@ -71,33 +64,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       XFile? file =
                           await img.pickImage(source: ImageSource.gallery);
                       if (file != null) {
-                        Reference imgDir =
-                            storage.child("Images").child(file.name);
-                        try {
-                          imgDir
-                              .putFile(File(file.path.toString()))
-                              .snapshotEvents
-                              .listen((snapshot) async {
-                            switch (snapshot.state) {
-                              case TaskState.success:
-                                showSnackBar("Upload Successful", context);
-                                String path = await imgDir.getDownloadURL();
-                                setState(() {
-                                  imgPath = path.toString();
-                                });
-                                break;
-                              case TaskState.error:
-                                showSnackBar(
-                                    "Some error occurred,Please Try again!",
-                                    context);
-                                break;
-                              default:
-                                break;
-                            }
-                          });
-                        } catch (e) {
-                          showSnackBar(e.toString(), context);
-                        }
+                        firebaseData.storeImage(
+                          file,
+                          (value) => showSnackBar(value, context),
+                          (path) => setState(() {
+                            imgPath = path;
+                          }),
+                        );
                       }
                     },
                     child: CircleAvatar(
@@ -177,47 +150,22 @@ class _SignupScreenState extends State<SignupScreen> {
                         return;
                       }
 
-                      try {
-                        await auth.createUserWithEmailAndPassword(
-                            email: emailController.text,
-                            password: passwordController.text);
+                      bool isSignedUp = await firebaseData.signupUser(
+                          fullNameController.text,
+                          imgPath,
+                          emailController.text,
+                          passwordController.text,
+                          usernameController.text, (value) {
+                        showSnackBar(value, context);
+                      });
 
-                        final user = <String, dynamic>{
-                          'name': fullNameController.text,
-                          'email': emailController.text,
-                          'username': usernameController.text,
-                          'imgPath': imgPath
-                        };
-
-                        db.collection('Users').add(user);
-
-                        await db
-                            .collection('Users')
-                            .where('email', isEqualTo: auth.currentUser!.email)
-                            .get()
-                            .then(
-                          (value) {
-                            for (var doc in value.docs) {
-                              showSnackBar(
-                                  "user created : ${doc.data()['username']}",
-                                  context);
-                            }
-                          },
-                        );
-
-                        fullNameController.clear();
-                        emailController.clear();
-                        usernameController.clear();
-                        passwordController.clear();
-                        rePasswordController.clear();
-
+                      if (isSignedUp) {
+                        _formKey.currentState!.reset();
                         Navigator.of(context).pushNamedAndRemoveUntil(
                             AllChatScreen.id, (Route<dynamic> route) => false);
-                      } catch (e) {
-                        showSnackBar(e.toString(), context);
                       }
                     },
-                  )
+                  ),
                 ],
               ),
             ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../Components/chat_tile.dart';
+import 'search_screen.dart';
+import 'package:chat_app/Components/chat_tile.dart';
+import 'package:chat_app/Components/app_drawer.dart';
+import 'package:chat_app/utilities/firebase_data.dart';
 
 class AllChatScreen extends StatefulWidget {
   const AllChatScreen({super.key});
@@ -13,41 +16,17 @@ class AllChatScreen extends StatefulWidget {
 class _AllChatScreenState extends State<AllChatScreen> {
   String name = "Ali";
   TextEditingController msgController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        backgroundColor: Colors.blueGrey,
-        child: SafeArea(
-          child: Column(
-            children: [
-              DrawerHeader(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    const Text(
-                      "Drawer Header",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.close),
-                    )
-                  ],
-                ),
-              ),
-              const Text("Hello"),
-              const Text("Hello"),
-              const Text("Hello"),
-              const Text("Hello"),
-            ],
-          ),
-        ),
-      ),
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text("Chats"),
         actions: [
@@ -60,69 +39,17 @@ class _AllChatScreenState extends State<AllChatScreen> {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
-          children: [
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-            ChatTile(
-              title: "Ali",
-              subtitle: "Hello",
-            ),
-          ],
+          children: const [],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) => const SearchScreen(),
+          );
+        },
+        child: const Icon(Icons.add_comment),
       ),
     );
   }

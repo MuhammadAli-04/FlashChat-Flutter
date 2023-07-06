@@ -1,14 +1,13 @@
+import 'package:flutter/material.dart';
+
+import 'package:chat_app/Components/button.dart';
+import 'package:chat_app/Components/input_field.dart';
+import 'package:chat_app/Components/heading.dart';
 import 'package:chat_app/Screens/allchats_screen.dart';
 import 'package:chat_app/utilities/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import '../Components/button.dart';
-import '../Components/input_field.dart';
-import '../Components/heading.dart';
+import 'package:chat_app/utilities/validation.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-
-import '../utilities/validation.dart';
+import 'package:chat_app/utilities/firebase_data.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,12 +19,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  final auth = FirebaseAuth.instance;
-  final storage = FirebaseFirestore.instance;
+  FirebaseData firebaseData = FirebaseData();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const Heading(text: "Login "),
               Form(
-                key: formKey,
+                key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -73,34 +71,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     Button(
                       text: "Login",
                       onPressed: () async {
-                        if (!formKey.currentState!.validate()) {
+                        if (!_formKey.currentState!.validate()) {
                           return;
                         }
 
-                        try {
-                          await auth.signInWithEmailAndPassword(
-                              email: emailController.text,
-                              password: passwordController.text);
-                          storage
-                              .collection("Users")
-                              .where('email', isEqualTo: emailController.text)
-                              .get()
-                              .then((value) {
-                            for (var doc in value.docs) {
-                              showSnackBar(
-                                  "user logged in : ${doc.data()['username']}",
-                                  context);
-                            }
-                          });
+                        bool isSignedIn = await firebaseData.signinUser(
+                            emailController.text,
+                            passwordController.text,
+                            (value) => showSnackBar(value, context));
+
+                        if (isSignedIn) {
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               AllChatScreen.id,
                               (Route<dynamic> route) => false);
-                        } catch (e) {
-                          showSnackBar(e.toString(), context);
+                          _formKey.currentState!.reset();
                         }
-
-                        emailController.clear();
-                        passwordController.clear();
                       },
                     ),
                   ],

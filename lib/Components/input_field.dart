@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chat_app/utilities/constants.dart';
 
 class InputField extends StatefulWidget {
-  InputField(
+  const InputField(
       {super.key,
       required this.controller,
       this.hintText = "",
@@ -13,9 +13,9 @@ class InputField extends StatefulWidget {
 
   final TextEditingController controller;
   final TextInputType keyboard;
-  String hintText;
-  IconData? icon;
-  bool obscureData;
+  final String hintText;
+  final IconData? icon;
+  final bool obscureData;
   final String? Function(String?) validator;
 
   @override

@@ -2,12 +2,12 @@ import 'package:chat_app/Screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 class ChatTile extends StatelessWidget {
-  ChatTile(
+  const ChatTile(
       {super.key, required this.title, required this.subtitle, this.imgUrl});
 
   final String title;
   final String subtitle;
-  String? imgUrl;
+  final String? imgUrl;
 
   @override
   Widget build(BuildContext context) {
