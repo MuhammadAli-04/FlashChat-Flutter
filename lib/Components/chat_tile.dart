@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 
 class ChatTile extends StatelessWidget {
   const ChatTile(
-      {super.key, required this.title, required this.subtitle, this.imgUrl});
+      {super.key,
+      required this.name,
+      required this.message,
+      required this.username,
+      this.imgUrl});
 
-  final String title;
-  final String subtitle;
+  final String name;
+  final String message;
   final String? imgUrl;
+  final String username;
 
   @override
   Widget build(BuildContext context) {
@@ -16,18 +21,20 @@ class ChatTile extends StatelessWidget {
       child: ListTile(
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      ChatScreen(name: title, imgUrl: imgUrl)));
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  ChatScreen(name: name, username: username, imgUrl: imgUrl),
+            ),
+          );
         },
         leading: CircleAvatar(
           backgroundImage: const AssetImage('images/user.jpg'),
           foregroundImage: imgUrl != null ? NetworkImage(imgUrl!) : null,
           radius: 30.0,
         ),
-        title: Text(title),
-        subtitle: Text(subtitle),
+        title: Text(name),
+        subtitle: Text(message),
       ),
     );
   }

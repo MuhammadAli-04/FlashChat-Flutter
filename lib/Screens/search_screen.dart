@@ -44,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
             topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(32.0, 32.0, 32.0, 8.0),
+        padding: const EdgeInsets.fromLTRB(30.0, 32.0, 30.0, 8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,

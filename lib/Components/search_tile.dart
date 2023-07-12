@@ -35,9 +35,15 @@ class SearchTile extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChatScreen(name: data['name'])));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      name: data['name'],
+                      username: data['username'],
+                      imgUrl: data['imgPath'],
+                    ),
+                  ),
+                );
               },
               child: const Text(
                 "Message",

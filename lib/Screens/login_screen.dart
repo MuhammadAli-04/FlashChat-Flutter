@@ -34,11 +34,13 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Hero(
-                tag: 'logo',
-                child: Image.asset(
-                  'images/logo.png',
-                  height: 150.0,
+              Flexible(
+                child: Hero(
+                  tag: 'logo',
+                  child: Image.asset(
+                    'images/logo.png',
+                    height: 150.0,
+                  ),
                 ),
               ),
               const Heading(text: "Login "),

@@ -1,9 +1,13 @@
 import 'package:chat_app/Screens/welcome_screen.dart';
+import 'package:chat_app/utilities/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:chat_app/utilities/firebase_data.dart';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+  AppDrawer({super.key});
+
+  final firebaseData = FirebaseData();
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +29,9 @@ class AppDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    const Text(
-                      "Drawer Header",
-                      style: TextStyle(fontSize: 20),
+                    Text(
+                      firebaseData.getCurrentUserData()!['name'].toString(),
+                      style: const TextStyle(fontSize: 20),
                     ),
                     IconButton(
                       onPressed: () {
@@ -47,10 +51,14 @@ class AppDrawer extends StatelessWidget {
                 ],
               ),
               TextButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, WelcomeScreen.id, (route) => false);
+                onPressed: () async {
+                  bool isSignedOut = await firebaseData.signOut((value) {
+                    showSnackBar(value, context);
+                  });
+                  isSignedOut
+                      ? Navigator.pushNamedAndRemoveUntil(
+                          context, WelcomeScreen.id, (route) => false)
+                      : null;
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.blueAccent,

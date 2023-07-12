@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:chat_app/Components/input_field.dart';
 import 'package:chat_app/Components/button.dart';
@@ -64,13 +67,35 @@ class _SignupScreenState extends State<SignupScreen> {
                       XFile? file =
                           await img.pickImage(source: ImageSource.gallery);
                       if (file != null) {
-                        firebaseData.storeImage(
-                          file,
-                          (value) => showSnackBar(value, context),
-                          (path) => setState(() {
-                            imgPath = path;
-                          }),
-                        );
+                        Reference imgDir = FirebaseStorage.instance
+                            .ref()
+                            .child("Images")
+                            .child(file.name);
+                        try {
+                          imgDir
+                              .putFile(File(file.path.toString()))
+                              .snapshotEvents
+                              .listen((snapshot) async {
+                            switch (snapshot.state) {
+                              case TaskState.success:
+                                showSnackBar("Upload Successful", context);
+                                String path = await imgDir.getDownloadURL();
+                                setState(() {
+                                  imgPath = path;
+                                });
+                                break;
+                              case TaskState.error:
+                                showSnackBar(
+                                    "Some error occurred,Please Try again!",
+                                    context);
+                                break;
+                              default:
+                                break;
+                            }
+                          });
+                        } catch (e) {
+                          showSnackBar(e.toString(), context);
+                        }
                       }
                     },
                     child: CircleAvatar(
