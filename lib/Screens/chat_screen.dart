@@ -55,15 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void setChat() async {
     path = DateTime.now().millisecondsSinceEpoch.toString();
     await FirebaseFirestore.instance.collection('Messages').doc(path!).set(
-      {
-        "messages": [
-          {
-            "sender": "System",
-            "message": "Say Hi 👋 to ${widget.name} ",
-            "time": DateTime.now().toString()
-          }
-        ]
-      },
+      {"messages": []},
     );
 
     Map<String, dynamic> chat = {'participants': participants, 'chat': path};
@@ -115,20 +107,26 @@ class _ChatScreenState extends State<ChatScreen> {
                           return const Center(
                               child: CircularProgressIndicator());
                         }
+
                         var data = snapshot.data!.data()!['messages'] as List;
                         data = data.reversed.toList();
-                        // for (var doc in snapshot.data.data()) {
-                        //   print("snapshot");
-                        //   data = doc.data();
-                        // }
-                        // print("snapshot data : $data");
+
+                        if (data.isEmpty) {
+                          return Expanded(
+                            child: Center(
+                              child: MessageBubble(
+                                  isMe: false,
+                                  sender: "System",
+                                  text: "Say hi 👋 to ${widget.username}"),
+                            ),
+                          );
+                        }
 
                         return ListView.builder(
                           reverse: true,
                           itemCount: data.length,
                           itemBuilder: (context, index) {
-                            // print(data.length);
-                            // print(data[index]);
+                            print("data[index] : ${data[index]}");
                             return MessageBubble(
                               sender: data[index]['sender'],
                               text: data[index]['message'],
